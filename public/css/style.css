@@ -1,0 +1,286 @@
+/* ============================================================
+   SMSU Mustang RideShare — Global Stylesheet
+   Colors: Mustang Purple #4b2e83 · Gold #ffcc33
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+  --mustang-purple: #4b2e83;
+  --mustang-purple-dark: #3a2264;
+  --mustang-purple-light: #6b4da3;
+  --mustang-gold: #ffcc33;
+  --mustang-gold-dark: #e6b800;
+  --mustang-light: #f5f2fb;
+  --mustang-white: #ffffff;
+  --text-dark: #1a1a2e;
+  --text-muted: #6b7280;
+  --card-shadow: 0 2px 12px rgba(75, 46, 131, 0.10);
+  --card-shadow-hover: 0 6px 24px rgba(75, 46, 131, 0.18);
+
+  --bs-primary: var(--mustang-purple);
+  --bs-primary-rgb: 75, 46, 131;
+}
+
+/* ---- Base ---- */
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--mustang-light);
+  color: var(--text-dark);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ============================================================
+   SMSU LOGO WATERMARK BACKGROUND
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, 80vw);
+  height: min(600px, 80vw);
+  background-image: url('/img/mustang-logo-gold.png.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure content sits above watermark */
+.container, .container-fluid, nav, footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Typography ---- */
+h1, h2, h3, h4, h5 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+/* ---- Navbar ---- */
+.navbar {
+  background: var(--mustang-purple) !important;
+  box-shadow: 0 2px 16px rgba(75, 46, 131, 0.25);
+}
+.navbar-brand span { color: #fff; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem; }
+.navbar-brand img { filter: drop-shadow(0 0 4px rgba(255,204,51,0.6)); }
+.nav-link { color: rgba(255,255,255,0.85) !important; font-weight: 500; transition: color 0.2s; }
+.nav-link:hover { color: var(--mustang-gold) !important; }
+.nav-link.text-danger { color: #ff8080 !important; }
+.navbar-toggler-icon { filter: invert(1); }
+
+/* ---- Cards ---- */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  background: var(--mustang-white);
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: var(--card-shadow-hover); }
+.card-header {
+  background: linear-gradient(135deg, var(--mustang-purple) 0%, var(--mustang-purple-light) 100%);
+  color: white;
+  border-radius: 12px 12px 0 0 !important;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border: none;
+}
+.card-header h5 { color: white; margin: 0; }
+.card-header .badge { background: rgba(255,255,255,0.2) !important; color: white; }
+
+/* ---- Stat / Summary Cards ---- */
+.summary-card {
+  background: linear-gradient(135deg, var(--mustang-purple) 0%, var(--mustang-purple-light) 100%);
+  color: white;
+  border-radius: 14px;
+  border: none;
+}
+.summary-card .summary-label { font-size: 0.78rem; opacity: 0.8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.summary-card .summary-value { font-size: 2rem; font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1.1; }
+.summary-card:hover { box-shadow: 0 8px 28px rgba(75, 46, 131, 0.35); transform: translateY(-1px); transition: all 0.2s; }
+
+/* ---- Buttons ---- */
+.btn-gold {
+  background: var(--mustang-gold);
+  border-color: var(--mustang-gold);
+  color: var(--mustang-purple);
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
+}
+.btn-gold:hover {
+  background: var(--mustang-gold-dark);
+  border-color: var(--mustang-gold-dark);
+  color: var(--mustang-purple);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255,204,51,0.4);
+}
+.btn-primary { background-color: var(--mustang-purple); border-color: var(--mustang-purple); font-weight: 600; }
+.btn-primary:hover { background-color: var(--mustang-purple-dark); border-color: var(--mustang-purple-dark); }
+.btn-outline-primary { color: var(--mustang-purple); border-color: var(--mustang-purple); font-weight: 600; }
+.btn-outline-primary:hover { background-color: var(--mustang-purple); border-color: var(--mustang-purple); }
+
+/* ---- Track button special ---- */
+.btn-track {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  border: none;
+  transition: all 0.2s;
+}
+.btn-track:hover {
+  background: linear-gradient(135deg, #1557b0, #0a357d);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26,115,232,0.4);
+}
+
+/* ---- Tables ---- */
+.table th {
+  background: rgba(75, 46, 131, 0.06);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--mustang-purple);
+  border-bottom: 2px solid rgba(75,46,131,0.12);
+}
+.table td { vertical-align: middle; }
+
+/* ---- List group ---- */
+.list-group-item { border-left: none; border-right: none; }
+.list-group-item:first-child { border-top: none; }
+.list-group-item:last-child { border-bottom: none; }
+
+/* ---- Badges ---- */
+.badge { font-family: 'Outfit', sans-serif; font-weight: 600; }
+
+/* ---- Alerts ---- */
+.alert { border-radius: 10px; border: none; font-weight: 500; }
+.alert-success { background: #d1fae5; color: #065f46; }
+.alert-danger { background: #fee2e2; color: #991b1b; }
+
+/* ---- Form controls ---- */
+.form-control:focus, .form-select:focus {
+  border-color: var(--mustang-purple);
+  box-shadow: 0 0 0 3px rgba(75, 46, 131, 0.15);
+}
+.form-label { font-weight: 600; font-size: 0.875rem; color: var(--text-dark); font-family: 'Outfit', sans-serif; }
+
+/* ---- Map containers ---- */
+#rideMap, #trackMap, #pickMap {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(75,46,131,0.15);
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.leaflet-popup-tip { background: white; }
+
+/* Custom map markers */
+.driver-marker-icon, .student-marker-icon, .depart-marker-icon, .dest-marker-icon {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 20px; border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ---- Live tracking pulse animation ---- */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  80%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.live-pulse {
+  position: relative;
+  display: inline-block;
+  width: 10px; height: 10px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+.live-pulse::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* ---- SMSU page header accent ---- */
+.page-header-accent {
+  background: linear-gradient(135deg, var(--mustang-purple) 0%, var(--mustang-purple-light) 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.page-header-accent::after {
+  content: '🐎';
+  position: absolute;
+  right: 1.5rem; top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  opacity: 0.15;
+}
+.page-header-accent h2, .page-header-accent h1 { color: white; margin: 0; }
+.page-header-accent p { color: rgba(255,255,255,0.75); margin: 0.25rem 0 0; }
+
+/* ---- Footer ---- */
+footer {
+  background: var(--mustang-purple);
+  color: rgba(255,255,255,0.6);
+  padding: 1rem 0;
+  font-size: 0.82rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+footer a { color: var(--mustang-gold); text-decoration: none; }
+
+/* ---- Auth pages ---- */
+.auth-card {
+  max-width: 420px;
+  margin: 5vh auto;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(75,46,131,0.15);
+}
+.auth-logo { width: 72px; height: 72px; margin: 0 auto 1rem; display: block; }
+
+/* ---- Ride card in list ---- */
+.ride-list-item {
+  transition: background 0.15s;
+}
+.ride-list-item:hover {
+  background: rgba(75,46,131,0.03);
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(75,46,131,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mustang-purple); }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .page-header-accent::after { display: none; }
+  .summary-value { font-size: 1.6rem; }
+}

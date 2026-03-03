@@ -1,0 +1,278 @@
+<%- include('../partials/head', { title: 'Live Tracking' }) %>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<%- include('../partials/navbar') %>
+
+<div class="container py-4">
+  <!-- Header -->
+  <div class="page-header-accent mb-4">
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <span class="live-pulse me-1"></span>
+      <h2 class="mb-0">Live Ride Tracking</h2>
+    </div>
+    <p class="mb-0">
+      <strong><%= ride.departureLocation %></strong> &rarr; <strong><%= ride.destination %></strong>
+      &nbsp;·&nbsp; Driver: <%= ride.driver ? ride.driver.fullName : 'Unknown' %>
+    </p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Map -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>📍 Live Map</span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="live-pulse"></span>
+            <small id="statusText" class="text-white opacity-75">Connecting...</small>
+          </div>
+        </div>
+        <div id="trackMap" style="height: 480px;"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Location sharing control -->
+      <div class="card mb-3">
+        <div class="card-header">📡 Your Location</div>
+        <div class="card-body">
+          <p class="small text-muted mb-3">Share your real-time location so others can see where you are on the map.</p>
+          <button id="shareBtn" class="btn btn-gold w-100 mb-2" onclick="startSharing()">
+            📍 Start Sharing Location
+          </button>
+          <button id="stopBtn" class="btn btn-outline-danger w-100 d-none" onclick="stopSharing()">
+            ⛔ Stop Sharing
+          </button>
+          <div id="coordDisplay" class="mt-2 text-muted small d-none">
+            Lat: <span id="latVal">—</span> &nbsp; Lng: <span id="lngVal">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Participants -->
+      <div class="card mb-3">
+        <div class="card-header">👥 Participants on Map</div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" id="participantsList">
+            <li class="list-group-item text-muted small">Waiting for locations...</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Ride Info -->
+      <div class="card">
+        <div class="card-header">🚗 Ride Details</div>
+        <div class="card-body small">
+          <p class="mb-1"><strong>From:</strong> <%= ride.departureLocation %></p>
+          <p class="mb-1"><strong>To:</strong> <%= ride.destination %></p>
+          <p class="mb-1"><strong>Time:</strong> <%= new Date(ride.departureTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %></p>
+          <p class="mb-1"><strong>Driver:</strong> <%= ride.driver ? ride.driver.fullName : 'Unknown' %></p>
+          <% if (ride.vehicleInfo) { %>
+            <p class="mb-0"><strong>Vehicle:</strong> <%= ride.vehicleInfo %></p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const RIDE_ID = '<%= rideId %>';
+const MY_ROLE = '<%= user.role %>';
+const MY_NAME = '<%= user.fullName || user.email %>';
+
+// Marshall, MN as default center (SMSU campus area)
+const SMSU_CENTER = [44.4469, -95.7882];
+
+// ---- Map setup ----
+const map = L.map('trackMap').setView(SMSU_CENTER, 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19,
+}).addTo(map);
+
+// Add departure/destination pins if coords saved
+<% if (ride.departureCoords && ride.departureCoords.lat) { %>
+  L.marker([<%= ride.departureCoords.lat %>, <%= ride.departureCoords.lng %>], {
+    icon: makeEmojiIcon('🟢', 34)
+  }).addTo(map).bindPopup('<strong>Departure:</strong><br><%= ride.departureLocation %>');
+<% } %>
+<% if (ride.destinationCoords && ride.destinationCoords.lat) { %>
+  L.marker([<%= ride.destinationCoords.lat %>, <%= ride.destinationCoords.lng %>], {
+    icon: makeEmojiIcon('🏁', 34)
+  }).addTo(map).bindPopup('<strong>Destination:</strong><br><%= ride.destination %>');
+<% } %>
+
+// ---- Marker helpers ----
+function makeEmojiIcon(emoji, size) {
+  return L.divIcon({
+    html: `<div style="font-size:${size}px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">${emoji}</div>`,
+    className: '',
+    iconSize: [size, size],
+    iconAnchor: [size/2, size],
+    popupAnchor: [0, -size],
+  });
+}
+
+// Active markers keyed by userId
+const markers = {};
+
+function roleEmoji(role) {
+  if (role === 'driver') return '🚗';
+  return '🙋';
+}
+
+function updateMarkers(locations) {
+  const ids = Object.keys(locations);
+  const participantsList = document.getElementById('participantsList');
+
+  // Remove stale markers
+  Object.keys(markers).forEach(id => {
+    if (!ids.includes(id)) {
+      map.removeLayer(markers[id]);
+      delete markers[id];
+    }
+  });
+
+  // Update / add markers
+  ids.forEach(id => {
+    const loc = locations[id];
+    const emoji = roleEmoji(loc.role);
+    const icon = makeEmojiIcon(emoji, 36);
+    const age = Math.round((Date.now() - loc.updatedAt) / 1000);
+    const popupHtml = `<strong>${emoji} ${loc.name}</strong><br>Role: ${loc.role}<br><small>Updated ${age}s ago</small>`;
+
+    if (markers[id]) {
+      markers[id].setLatLng([loc.lat, loc.lng]);
+      markers[id].setPopupContent(popupHtml);
+    } else {
+      markers[id] = L.marker([loc.lat, loc.lng], { icon })
+        .addTo(map)
+        .bindPopup(popupHtml);
+    }
+  });
+
+  // Update sidebar participants list
+  if (ids.length === 0) {
+    participantsList.innerHTML = '<li class="list-group-item text-muted small">No one is sharing location yet.</li>';
+  } else {
+    participantsList.innerHTML = ids.map(id => {
+      const loc = locations[id];
+      const age = Math.round((Date.now() - loc.updatedAt) / 1000);
+      const fresh = age < 15;
+      return `<li class="list-group-item d-flex justify-content-between align-items-center small">
+        <span>${roleEmoji(loc.role)} <strong>${loc.name}</strong> <em class="text-muted">(${loc.role})</em></span>
+        <span class="badge ${fresh ? 'bg-success' : 'bg-secondary'}">${age}s ago</span>
+      </li>`;
+    }).join('');
+  }
+
+  // Auto-fit map to show all markers
+  if (ids.length > 0) {
+    const latlngs = ids.map(id => [locations[id].lat, locations[id].lng]);
+    map.fitBounds(latlngs, { padding: [50, 50], maxZoom: 16 });
+  }
+
+  document.getElementById('statusText').textContent =
+    ids.length > 0 ? `${ids.length} user(s) live` : 'No active locations';
+}
+
+// ---- SSE real-time connection ----
+let evtSource = null;
+
+function connectSSE() {
+  evtSource = new EventSource(`/api/location/${RIDE_ID}/stream`);
+  evtSource.onmessage = function(e) {
+    try {
+      const data = JSON.parse(e.data);
+      updateMarkers(data);
+    } catch (err) {}
+  };
+  evtSource.onerror = function() {
+    document.getElementById('statusText').textContent = 'Reconnecting...';
+    // Fallback to polling if SSE fails
+    setTimeout(pollLocations, 4000);
+  };
+  evtSource.onopen = function() {
+    document.getElementById('statusText').textContent = 'Connected';
+  };
+}
+
+// Polling fallback
+function pollLocations() {
+  fetch(`/api/location/${RIDE_ID}`)
+    .then(r => r.json())
+    .then(data => updateMarkers(data))
+    .catch(() => {});
+}
+
+// ---- Location sharing ----
+let watchId = null;
+let shareInterval = null;
+
+function startSharing() {
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported by your browser.');
+    return;
+  }
+  document.getElementById('shareBtn').disabled = true;
+  document.getElementById('shareBtn').textContent = '📡 Getting location...';
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      sendLocation(pos.coords.latitude, pos.coords.longitude);
+      document.getElementById('shareBtn').classList.add('d-none');
+      document.getElementById('stopBtn').classList.remove('d-none');
+      document.getElementById('coordDisplay').classList.remove('d-none');
+
+      // Watch for continuous updates
+      watchId = navigator.geolocation.watchPosition(pos => {
+        sendLocation(pos.coords.latitude, pos.coords.longitude);
+      }, null, { enableHighAccuracy: true, maximumAge: 5000 });
+    },
+    err => {
+      alert('Could not get location: ' + err.message);
+      document.getElementById('shareBtn').disabled = false;
+      document.getElementById('shareBtn').textContent = '📍 Start Sharing Location';
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function stopSharing() {
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+  }
+  document.getElementById('shareBtn').classList.remove('d-none');
+  document.getElementById('shareBtn').disabled = false;
+  document.getElementById('shareBtn').textContent = '📍 Start Sharing Location';
+  document.getElementById('stopBtn').classList.add('d-none');
+  document.getElementById('coordDisplay').classList.add('d-none');
+}
+
+async function sendLocation(lat, lng) {
+  document.getElementById('latVal').textContent = lat.toFixed(5);
+  document.getElementById('lngVal').textContent = lng.toFixed(5);
+  try {
+    await fetch(`/api/location/${RIDE_ID}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lat, lng }),
+    });
+  } catch (e) {}
+}
+
+// Refresh marker ages every 5s even without new data
+setInterval(() => {
+  const lists = document.querySelectorAll('#participantsList li');
+  if (lists.length > 0) pollLocations();
+}, 8000);
+
+// Start!
+connectSSE();
+</script>
+
+<%- include('../partials/footer') %>

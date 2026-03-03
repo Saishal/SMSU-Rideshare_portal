@@ -1,0 +1,178 @@
+<%- include('../partials/head', { title: 'Driver Dashboard' }) %>
+<%- include('../partials/navbar') %>
+
+<div class="container my-4">
+
+  <div class="page-header-accent mb-4">
+    <h2>Driver Dashboard</h2>
+    <p>Welcome, <strong><%= user.fullName %></strong>! Manage your rides, respond to requests, and share your live location.</p>
+  </div>
+
+  <% if (locals.success && success) { %>
+    <div class="alert alert-success alert-dismissible fade show">
+      <%= success %><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% } %>
+  <% if (locals.error && error) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
+      <%= error %><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% } %>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="card summary-card">
+        <div class="card-body text-center py-3">
+          <div class="summary-label">My Rides</div>
+          <div class="summary-value"><%= myRides.length %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card summary-card">
+        <div class="card-body text-center py-3">
+          <div class="summary-label">Pending</div>
+          <div class="summary-value"><%= requests.filter(function(r){ return r.status === 'Pending'; }).length %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card summary-card">
+        <div class="card-body text-center py-3">
+          <div class="summary-label">Accepted</div>
+          <div class="summary-value"><%= requests.filter(function(r){ return r.status === 'Accepted'; }).length %></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card summary-card">
+        <div class="card-body text-center py-3">
+          <div class="summary-label">Messages</div>
+          <div class="summary-value"><%= messages.length %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left: My Rides -->
+    <div class="col-lg-7">
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>🚗 My Posted Rides</span>
+          <a href="/rides/new" class="btn btn-gold btn-sm">+ Post New Ride</a>
+        </div>
+        <div class="card-body p-0">
+          <% if (myRides.length === 0) { %>
+            <div class="p-3 text-center text-muted">
+              <p class="mb-2">No rides posted yet.</p>
+              <a href="/rides/new" class="btn btn-gold">Post Your First Ride</a>
+            </div>
+          <% } else { %>
+            <div class="list-group list-group-flush">
+              <% myRides.forEach(function(ride) { %>
+                <div class="list-group-item ride-list-item px-3 py-3">
+                  <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div class="flex-grow-1">
+                      <p class="mb-1 fw-semibold" style="font-family:'Outfit',sans-serif;">
+                        <%= ride.departureLocation %> &rarr; <%= ride.destination %>
+                      </p>
+                      <p class="mb-1 small text-muted">
+                        🕐 <%= new Date(ride.departureTime).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) %>
+                        &nbsp;&middot;&nbsp;
+                        <% if (ride.availableSeats === 0) { %>
+                          <span class="badge bg-danger">Full</span>
+                        <% } else { %>
+                          🪑 <%= ride.availableSeats %> seat(s) left
+                        <% } %>
+                      </p>
+                      <% if (ride.vehicleInfo) { %>
+                        <p class="mb-0 small text-muted">🚙 <%= ride.vehicleInfo %></p>
+                      <% } %>
+                    </div>
+                    <div class="d-flex flex-column gap-1 align-items-end">
+                      <a href="/tracking/<%= ride._id %>" class="btn btn-track btn-sm" target="_blank">
+                        📍 Live Track
+                      </a>
+                      <form method="POST" action="/admin/rides/<%= ride._id %>/delete"
+                        onsubmit="return confirm('Delete this ride?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="card">
+        <div class="card-header">💬 Recent Passenger Messages</div>
+        <div class="card-body small">
+          <% if (messages.length === 0) { %>
+            <p class="text-muted mb-0">No messages yet.</p>
+          <% } else { %>
+            <% messages.forEach(function(msg, i) { %>
+              <% if (i > 0) { %><hr class="my-2"/><% } %>
+              <p class="mb-1">
+                <strong><%= msg.sender ? msg.sender.fullName : 'Unknown' %></strong>
+                <span class="text-muted" style="font-size:0.75rem;">
+                  · <%= new Date(msg.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) %>
+                </span><br/>
+                <span class="fst-italic text-secondary">"<%= msg.content %>"</span>
+              </p>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Incoming Requests -->
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header">📥 Incoming Ride Requests</div>
+        <div class="card-body p-0">
+          <% if (requests.length === 0) { %>
+            <p class="text-muted small p-3 mb-0">No requests yet. Once students request your rides, they'll appear here.</p>
+          <% } else { %>
+            <ul class="list-group list-group-flush">
+              <% requests.forEach(function(req) { %>
+                <li class="list-group-item ride-list-item py-3 px-3">
+                  <p class="mb-1 small">
+                    👤 <strong><%= req.student ? req.student.fullName : 'Unknown' %></strong><br/>
+                    🗺️ <span class="text-muted"><%= req.ride ? (req.ride.departureLocation + ' → ' + req.ride.destination) : 'N/A' %></span>
+                  </p>
+                  <% if (req.message) { %>
+                    <p class="mb-2 text-muted fst-italic small">"<%= req.message %>"</p>
+                  <% } %>
+                  <% if (req.status === 'Pending') { %>
+                    <div class="d-flex gap-2">
+                      <form method="POST" action="/requests/<%= req._id %>/status">
+                        <input type="hidden" name="status" value="Accepted"/>
+                        <button type="submit" class="btn btn-success btn-sm">✓ Accept</button>
+                      </form>
+                      <form method="POST" action="/requests/<%= req._id %>/status">
+                        <input type="hidden" name="status" value="Rejected"/>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">✗ Reject</button>
+                      </form>
+                    </div>
+                  <% } else if (req.status === 'Accepted') { %>
+                    <span class="badge bg-success">✓ Accepted</span>
+                  <% } else { %>
+                    <span class="badge bg-danger">✗ Rejected</span>
+                  <% } %>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<%- include('../partials/footer') %>

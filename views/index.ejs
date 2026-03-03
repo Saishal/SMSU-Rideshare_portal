@@ -1,0 +1,42 @@
+<%- include('partials/head') %>
+<%- include('partials/navbar') %>
+
+<main class="container py-5">
+  <section class="row align-items-center mb-5">
+    <div class="col-md-6">
+      <h1 class="display-5 fw-bold mb-3">
+        Mustang RideShare
+      </h1>
+      <p class="lead">
+        A campus-based carpooling platform that helps SMSU students and staff
+        share rides safely, save money, and stay connected.
+      </p>
+      <div class="d-flex gap-3 mt-3">
+        <a href="/register" class="btn btn-gold btn-lg text-dark">Get Started</a>
+        <a href="/login" class="btn btn-outline-primary btn-lg">Log In</a>
+      </div>
+      <p class="mt-3 small text-muted">
+        Backend: Node.js, Express, MongoDB · Frontend: EJS + Bootstrap · Project name: <strong>Mustang RideShare</strong>.
+      </p>
+    </div>
+
+    <div class="col-md-6">
+      <div class="hero-card shadow-sm">
+        <h5 class="fw-semibold mb-3">Example Rides (MVP)</h5>
+        <ul class="list-unstyled mb-0 small">
+          <li class="mb-2">
+            <strong>Marshall → Sioux Falls</strong> · Today 5:30 PM · 2 seats
+          </li>
+          <li class="mb-2">
+            <strong>Campus → Minneapolis</strong> · Fri 2:00 PM · 1 seat
+          </li>
+          <li>
+            <strong>Campus → Walmart</strong> · Daily evening loop · 3 seats
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

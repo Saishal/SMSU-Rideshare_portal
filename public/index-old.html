@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SMSU RideShare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-logo">SMSU RideShare</div>
+    <nav class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#find-ride">Find a ride</a>
+      <a href="#offer-ride">Offer a ride</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Share rides. Save money. Stay connected.</h1>
+        <p>
+          A ride-sharing platform for SMSU students to coordinate trips safely and easily.
+        </p>
+        <div class="hero-actions">
+          <a href="#find-ride" class="btn primary">Find a Ride</a>
+          <a href="#offer-ride" class="btn ghost">Offer a Ride</a>
+        </div>
+        <p class="hero-note">
+          * Backend powered by Node.js, Express & MongoDB. Frontend is pure HTML/CSS for now.
+        </p>
+      </div>
+
+      <div class="hero-card">
+        <h2>Upcoming Popular Trips</h2>
+        <ul>
+          <li><span>Marshall → Sioux Falls</span><span>Fri · 5:00 PM</span></li>
+          <li><span>Marshall → Minneapolis</span><span>Sat · 9:00 AM</span></li>
+          <li><span>Campus → Walmart</span><span>Daily · 6:30 PM</span></li>
+        </ul>
+        <p class="small-text">Demo data only. We'll connect this to real rides later.</p>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="section">
+      <h2>How It Works</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>1. Sign up</h3>
+          <p>Students verify with SMSU email for a trusted community.</p>
+        </div>
+        <div class="card">
+          <h3>2. Find / offer rides</h3>
+          <p>Search trips or create your own with date, time, and seats.</p>
+        </div>
+        <div class="card">
+          <h3>3. Connect & travel</h3>
+          <p>Chat, confirm pickup, split costs, and ride together.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FIND RIDE FORM -->
+    <section id="find-ride" class="section form-section">
+      <h2>Find a Ride</h2>
+      <form class="form-grid">
+        <div class="form-field">
+          <label for="from">From</label>
+          <input id="from" type="text" placeholder="SMSU Campus" />
+        </div>
+        <div class="form-field">
+          <label for="to">To</label>
+          <input id="to" type="text" placeholder="e.g., Minneapolis" />
+        </div>
+        <div class="form-field">
+          <label for="date">Date</label>
+          <input id="date" type="date" />
+        </div>
+        <div class="form-field">
+          <label for="seats">Seats</label>
+          <input id="seats" type="number" min="1" value="1" />
+        </div>
+        <button type="button" class="btn primary full-width">
+          Search (frontend only for now)
+        </button>
+      </form>
+    </section>
+
+    <!-- OFFER RIDE FORM -->
+    <section id="offer-ride" class="section form-section">
+      <h2>Offer a Ride</h2>
+      <form class="form-grid">
+        <div class="form-field">
+          <label for="driver-from">From</label>
+          <input id="driver-from" type="text" placeholder="Your starting point" />
+        </div>
+        <div class="form-field">
+          <label for="driver-to">To</label>
+          <input id="driver-to" type="text" placeholder="Destination" />
+        </div>
+        <div class="form-field">
+          <label for="driver-date">Date & Time</label>
+          <input id="driver-date" type="datetime-local" />
+        </div>
+        <div class="form-field">
+          <label for="driver-seats">Seats available</label>
+          <input id="driver-seats" type="number" min="1" value="3" />
+        </div>
+        <button type="button" class="btn ghost full-width">
+          Post ride (frontend only for now)
+        </button>
+      </form>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2>About This Project</h2>
+      <p>
+        SMSU RideShare is a full-stack project using Node.js, Express, and MongoDB.
+        This page is the clean UI layer we’ll soon connect to your existing API
+        for real authentication, ride management, and messaging.
+      </p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; <span id="year"></span> SMSU RideShare. Built by Temesgen Mamo.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+

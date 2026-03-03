@@ -1,0 +1,83 @@
+<%- include('../partials/head', { title: 'Register - Mustang RideShare' }) %>
+<%- include('../partials/navbar') %>
+
+<div class="auth-wrapper">
+  <h1 class="page-title">Create Your Account</h1>
+
+  <p class="text-muted text-center mb-4">
+    Sign up for Mustang RideShare using your SMSU email to get started.
+  </p>
+
+  <% if (error) { %>
+    <div class="alert alert-danger py-2">
+      <%= error %>
+    </div>
+  <% } %>
+
+  <form method="POST" action="/register">
+    <div class="mb-3">
+      <label class="form-label">Full Name</label>
+      <input
+        type="text"
+        name="fullName"
+        class="form-control"
+        placeholder="John Doe"
+        value="<%= formData.fullName || '' %>"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input
+        type="email"
+        name="email"
+        class="form-control"
+        placeholder="you@smsu.edu"
+        value="<%= formData.email || '' %>"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Password</label>
+      <input
+        type="password"
+        name="password"
+        class="form-control"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Select Role</label>
+      <select name="role" class="form-select">
+        <option value="student" <%= formData.role === 'student' ? 'selected' : '' %>>
+          Student
+        </option>
+        <option value="driver" <%= formData.role === 'driver' ? 'selected' : '' %>>
+          Driver
+        </option>
+        <option value="admin" <%= formData.role === 'admin' ? 'selected' : '' %>>
+          Admin
+        </option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-gold w-100 mt-2">
+      Register
+    </button>
+  </form>
+
+  <p class="mt-3 mb-0 text-center">
+    Already have an account?
+    <a href="/login" class="auth-link">Log in here</a>.
+  </p>
+</div>
+
+<footer>
+  Mustang RideShare · SMSU · Demo MVP for URC Poster
+</footer>
+
+</body>
+</html>

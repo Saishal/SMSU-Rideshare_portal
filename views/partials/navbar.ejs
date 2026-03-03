@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img
+        src="/img/mustang-logo-gold.png.png"
+        alt="Mustang RideShare"
+        style="height:36px;width:auto;"
+      />
+      <span>Mustang RideShare</span>
+    </a>
+
+    <button class="navbar-toggler border-0" type="button"
+      data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="mainNavbar">
+      <ul class="navbar-nav mb-2 mb-lg-0 align-items-lg-center gap-1">
+        <% if (user && user.role === 'student') { %>
+          <li class="nav-item"><a class="nav-link" href="/dashboard/student">Dashboard</a></li>
+        <% } %>
+        <% if (user && user.role === 'driver') { %>
+          <li class="nav-item"><a class="nav-link" href="/dashboard/driver">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/rides/new">+ Post Ride</a></li>
+        <% } %>
+        <% if (user && user.role === 'admin') { %>
+          <li class="nav-item"><a class="nav-link" href="/dashboard/admin">Admin Panel</a></li>
+        <% } %>
+        <% if (user) { %>
+          <li class="nav-item">
+            <span class="nav-link disabled" style="color:rgba(255,204,51,0.8)!important;font-size:0.85rem;">
+              👋 <%= user.fullName ? user.fullName.split(' ')[0] : user.email %>
+            </span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout" style="color:#ff8080!important;">Logout</a>
+          </li>
+        <% } else { %>
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          <li class="nav-item"><a class="btn btn-gold ms-2 px-3" href="/register">Join Now</a></li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,38 @@
+<%- include('../partials/head', { title: 'Welcome to Mustang RideShare' }) %>
+<%- include('../partials/navbar') %>
+
+<div class="auth-wrapper text-center">
+  <h1 class="page-title mb-3">Welcome, <%= name %>!</h1>
+
+  <p class="mb-2">
+    Your <strong><%= role.charAt(0).toUpperCase() + role.slice(1) %></strong> account
+    has been created with <strong><%= email %></strong>.
+  </p>
+
+  <p class="text-muted mb-4">
+    You’re now signed in. Use the button below to open your dashboard
+    and start using Mustang RideShare.
+  </p>
+
+  <% 
+    let dashPath = '/dashboard/student';
+    if (role === 'driver') dashPath = '/dashboard/driver';
+    if (role === 'admin') dashPath = '/dashboard/admin';
+  %>
+
+  <a href="<%= dashPath %>" class="btn btn-gold w-100 mb-3">
+    Go to my dashboard
+  </a>
+
+  <p class="small">
+    Not you?
+    <a href="/logout" class="auth-link">Log out</a>.
+  </p>
+</div>
+
+<footer>
+  Mustang RideShare · SMSU · Demo MVP for URC Poster
+</footer>
+
+</body>
+</html>

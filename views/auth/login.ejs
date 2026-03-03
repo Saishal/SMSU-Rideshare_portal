@@ -1,0 +1,56 @@
+<%- include('../partials/head', { title: 'Login - Mustang RideShare' }) %>
+<%- include('../partials/navbar') %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h1 class="page-title mb-2">Welcome back</h1>
+    <p class="page-subtitle mb-4">
+      Log in with your Mustang RideShare account.
+    </p>
+
+    <% if (error && error.length) { %>
+      <div class="alert alert-danger">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form method="POST" action="/login" class="mt-3">
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input
+          type="email"
+          name="email"
+          class="form-control"
+          placeholder="you@smsu.edu"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-gold w-100">
+        Log In
+      </button>
+    </form>
+
+    <p class="mt-3 mb-0 text-center small">
+      Don’t have an account?
+      <a href="/register" class="auth-link">Create one here.</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  Mustang RideShare · SMSU · Demo MVP for URC Poster
+</footer>
+
+</body>
+</html>
